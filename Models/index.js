@@ -6,16 +6,14 @@ const OrderDetail = require('./orderDetails'); // Require the model
 
 // Define associations
 // Order and Customer associations
-Customer.hasMany(Order, { foreignKey: 'customerId' });
-Order.belongsTo(Customer, { foreignKey: 'customerId' });
-
-// OrderDetails and Order associations
 Order.hasMany(OrderDetail, { foreignKey: 'orderId' });
 OrderDetail.belongsTo(Order, { foreignKey: 'orderId' });
 
-// OrderDetails and Product associations
 Product.hasMany(OrderDetail, { foreignKey: 'productId' });
 OrderDetail.belongsTo(Product, { foreignKey: 'productId' });
+
+Customer.hasMany(Order, { foreignKey: 'customerId' });
+Order.belongsTo(Customer, { foreignKey: 'customerId' });
 
 
 async function init() {

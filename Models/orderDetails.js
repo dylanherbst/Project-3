@@ -15,7 +15,7 @@ OrderDetail.init({
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'orders', 
+            model: 'orders',
             key: 'id'
         }
     },
@@ -23,21 +23,21 @@ OrderDetail.init({
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'products', 
+            model: 'products',
             key: 'id'
         }
     },
     quantity: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: DataTypes.NOW
-    },
+        allowNull: false
+    }
 }, {
     sequelize: sequelizeInstance,
     modelName: 'orderDetail',
-    tableName: 'orderDetails',  // Sequelize automatically pluralizes model names for the table name
+    tableName: 'orderDetails',
     timestamps: true,
     freezeTableName: true 
 });
+
 
 module.exports = OrderDetail;

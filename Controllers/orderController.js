@@ -24,29 +24,21 @@ res.send({ result: 500, error: err.message });
 //     }
 
 const createOrder = async (req, res) => {
-    const { productId, customerId, quantity } = req.body;
+    const { customerId, products } = req.body;
 
     try {
-        // Find the product being ordered
-        const product = await Models.Product.findByPk(productId);
+        let totalPrice = 0;
 
-        // Check if the product exists
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
+        // Calculate total price based on product prices and quantities
+        for (const item of products) {
+            const product = await Models.Product.findByPk(item.productId);
+            if (!product || product.stock < item.quantity) {
+                throw new Error(`Product ${item.productId} not found or not enough stock`);
+            }
+            totalPrice += product.price * item.quantity;
         }
 
-        // Check if there is enough stock available
-        if (product.stock < quantity) {
-            return res.status(400).json({ message: 'Not enough stock available' });
-        }
-
-        const totalPrice = product.price * quantity;
-
-        // Reduce the product stock and save the updated product
-        product.stock -= quantity;
-        await product.save();
-
-        // Create the order
+        // Create the order with the initial total price
         const order = await Models.Order.create({
             customerId,
             orderDate: new Date(),
@@ -54,18 +46,22 @@ const createOrder = async (req, res) => {
             totalPrice: totalPrice
         });
 
-        // Create the order detail
-        const orderDetail = await Models.OrderDetail.create({
-            orderId: order.id,
-            productId,
-            quantity
-        });
+        // Create order details and update product stock
+        for (const item of products) {
+            const product = await Models.Product.findByPk(item.productId);
+            product.stock -= item.quantity;
+            await product.save();
+            await Models.OrderDetail.create({
+                orderId: order.id,
+                productId: item.productId,
+                quantity: item.quantity
+            });
+        }
 
-        // Return the created order and order detail
-        res.status(201).json({ order, orderDetail });
+        res.status(201).json({ message: 'Order created successfully', order });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error creating order' });
+        res.status(500).json({ message: 'Error creating order', error: error.message });
     }
 };
 

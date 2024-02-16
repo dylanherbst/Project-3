@@ -2,6 +2,7 @@ const { DataTypes, Model } = require("sequelize");
 let dbConnect = require("../dbConnect");
 const sequelizeInstance = dbConnect.Sequelize;
 
+
 class Order extends Model { }
 
 Order.init({
@@ -31,14 +32,12 @@ Order.init({
     },
     totalPrice: {
         type: DataTypes.DECIMAL(10, 2),
-        allowNull: false,
-        defaultValue: 0.00
+        allowNull: true
     }
-   
 }, {
     sequelize: sequelizeInstance,
     modelName: 'order',
-    tableName: 'orders',  // Sequelize automatically pluralizes model names for the table name
+    tableName: 'orders',
     timestamps: true,
     freezeTableName: true 
 });
